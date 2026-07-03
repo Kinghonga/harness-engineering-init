@@ -24,8 +24,28 @@ It's the practice of encoding a project's architecture constraints, conventions,
 - **Init** — scaffolds `.harness/` (checkpoints, traces, memory) only when absent; never re-scaffolds an existing one
 - **Checkpoints & traces** — records task starts and failure post-mortems with root cause and fix
 - **Baseline-aware verification** — captures the pre-existing violation count once, then treats only deltas as signal, so old debt doesn't drown new work
-- **Critic** — analyzes failure traces into reusable failure-pattern memory and proposes rule updates — the evolution half that usually never runs
+- **Critic** — analyzes failure traces into reusable failure-pattern memory and proposes rule updates; this is the learning step teams most often skip
 - **Evolve** — compiles workflows that succeed 3+ times into deterministic scripts
+
+## Project layout
+
+After init, your project gains a `.harness/` directory alongside `AGENTS.md`:
+
+```
+your-project/
+├── AGENTS.md              # entry point — points agents to .harness/
+└── .harness/
+    ├── baseline.json      # snapshot of pre-existing violations; only deltas count as signal
+    ├── tasks/             # task checkpoints — what was done, decided, verified
+    │   └── {name}-{date}.md
+    ├── trace/             # failure post-mortems — error, root cause, fix
+    │   └── failure-{type}-{date}.md
+    └── memory/
+        ├── episodic/      # one-off lessons ("this bit us once")
+        ├── failures/      # Critic output — recurring failure patterns + rule proposals
+        │   └── {pattern}.md
+        └── procedural/    # repeatable workflows compiled into scripts
+```
 
 ## Install
 
@@ -92,8 +112,28 @@ MIT
 - **Init**——仅在不存在时脚手架 `.harness/`（检查点、轨迹、记忆）；已有的不重复建
 - **检查点与轨迹**——记录任务起点，以及失败复盘（含根因与修复）
 - **基线感知验证**——首次记下既有违规数，之后只把增量当信号，老债务不淹没新改动
-- **Critic**——把失败轨迹分析成可复用的失败模式记忆，并提议规则更新——通常从不运行的那半
+- **Critic**——把失败轨迹分析成可复用的失败模式记忆，并提议规则更新；这是团队最常跳过的“学习”步骤
 - **进化**——成功 3 次以上的流程编译成确定性脚本
+
+## 项目布局
+
+init 之后，你的项目会在 `AGENTS.md` 旁多出一个 `.harness/` 目录：
+
+```
+your-project/
+├── AGENTS.md              # 入口 — 指向 .harness/
+└── .harness/
+    ├── baseline.json      # 既有违规快照；只把增量当信号
+    ├── tasks/             # 任务检查点 — 做了什么、决策、验证结果
+    │   └── {name}-{date}.md
+    ├── trace/             # 失败复盘 — 错误、根因、修复
+    │   └── failure-{type}-{date}.md
+    └── memory/
+        ├── episodic/      # 一次性教训（“这个坑过一次”）
+        ├── failures/      # Critic 产出 — 反复出现的失败模式 + 规则提议
+        │   └── {pattern}.md
+        └── procedural/    # 编译成脚本的可复用流程
+```
 
 ## 安装
 
