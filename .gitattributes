@@ -1,1 +1,5 @@
 * text=auto eol=lf
+
+# Skill content is Markdown; treat Python (test infra) as vendored so the
+# language bar reflects the actual artifact, not the test harness.
+*.py linguist-vendored
