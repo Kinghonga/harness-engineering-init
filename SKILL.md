@@ -37,13 +37,14 @@ file tools (list / read / stat). This touches nothing — run it freely.
 3. Find the newest checkpoint date. Records are named `{name}-{YYYYMMDD}.md`,
    so parse the date from filenames (fall back to file mtime only if a name
    has no date). Compute days since that date.
-4. Verdict:
-   - `failures/` empty **and** traces > 0 → **BROKEN**: the evolution loop
-     has never run. Say this out loud.
+4. Verdict (evaluate in order):
+   - `failures/` empty **and** traces > 0 → **BROKEN**: traces are waiting,
+     the Critic has never run. Say this out loud.
+   - no checkpoints at all → **EMPTY**: structure exists but nothing recorded yet.
    - newest checkpoint > 14 days → **DORMANT**.
-   - > 7 days → **STALE**.
-   - `failures/` non-empty and checkpoint ≤ 7 days → **HEALTHY**.
-   - no activity at all → **EMPTY**.
+   - newest checkpoint > 7 days → **STALE**.
+   - otherwise → **HEALTHY** (active; if traces exist, also run Phase 4 to
+     confirm none are unanalyzed).
 
 Do not proceed to scaffold or checkpoint as if all is well — a dead loop is
 the normal state and the thing to fix.
