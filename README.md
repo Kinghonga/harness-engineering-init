@@ -14,6 +14,10 @@
 
 A standard agent skill that scaffolds the `.harness/` loop, keeps it alive with a read-only health check, and makes it self-improving — so agent engineering stays on track instead of drifting. **Init is five minutes; keeping the loop alive is the job.**
 
+## What is harness engineering?
+
+It's the practice of encoding a project's architecture constraints, conventions, and verification gates into the repo itself — an `AGENTS.md` entry point, a `.harness/` memory store, and pre-verification checks — so an AI coding agent works reliably from what it can **see and verify**, not what it **remembers**. The aim is a self-improving loop: every failure is recorded, analyzed into a pattern, and fed back as a rule, so the next agent inherits the lessons.
+
 ## What it does
 
 - **Health check** — one read-only pass tells you whether the harness loop is alive, or silently dead (the usual state)
@@ -77,6 +81,10 @@ MIT
 > 在任意 AI 编码项目上落地并持续运转 harness engineering 范式。
 
 一个标准 agent skill，搭起 `.harness/` 循环、用只读健康检查让它活着、并自我改进——让 agent 工程不跑偏，而非随性漂移。**init 是 5 分钟，让 loop 活着才是活。**
+
+## 什么是 harness engineering？
+
+把项目的架构约束、规范和验证闸门编码进仓库的实践——一个 `AGENTS.md` 入口、一个 `.harness/` 记忆存储、一套预验证检查——让 AI 编码 agent 靠**看见与验证**可靠工作，而非靠**记忆**。目标是自我改进的循环：每次失败被记录、分析成模式、回写为规则，下一个 agent 继承这些教训。
 
 ## 它做什么
 
