@@ -10,35 +10,18 @@
 
 # harness-engineering-init
 
-> Adopt and sustain the harness-engineering paradigm on any project.
+> Adopt and sustain the harness-engineering paradigm on any AI coding project.
 
-A standard agent skill that helps you establish the `.harness/` loop, keep it alive with a read-only health check, and make it self-improving — so AI agent engineering stays on track instead of drifting.
-
-## The problem
-
-Teams set up AI-agent harnesses (`.harness/` with checkpoints, traces, memory) expecting the agent to learn from failures. Reality: the **recording half** (checkpoints + traces) limps along manually, while the **evolution half** (traces → Critic analysis → failure patterns → rule updates) **never runs once**. The harness becomes a beautiful graveyard — structure without a pulse. And because nothing reports its health, the failure is **silent**.
-
-This skill fixes exactly that:
-
-- Makes a dead loop **visible** (read-only health check)
-- Treats the evolution half as **the point**, not an afterthought
-- Is **honest** about what each agent platform can auto-enforce
-
-**Core idea: init is five minutes. Keeping the loop alive is the job.**
+A standard agent skill that scaffolds the `.harness/` loop, keeps it alive with a read-only health check, and makes it self-improving — so agent engineering stays on track instead of drifting. **Init is five minutes; keeping the loop alive is the job.**
 
 ## What it does
 
-```
-health check → init → checkpoint → verify+trace+baseline → Critic ★ → evolve
-  (read-only)  (if absent) (task start)    (on failure)       (the part that dies)
-```
-
-1. **Health check** — is the loop alive? (read-only, run freely)
-2. **Init** — scaffold `.harness/` only if absent
-3. **Checkpoint** — record when a task starts
-4. **Verify + trace + baseline** — on failure, record the trace; capture a baseline the first time and treat only **deltas** as signal (pre-existing debt is noise)
-5. **Critic** — analyze traces into failure patterns → propose rule updates ★
-6. **Evolve** — compile repeated flows into deterministic scripts
+- **Health check** — one read-only pass tells you whether the harness loop is alive, or silently dead (the usual state)
+- **Init** — scaffolds `.harness/` (checkpoints, traces, memory) only when absent; never re-scaffolds an existing one
+- **Checkpoints & traces** — records task starts and failure post-mortems with root cause and fix
+- **Baseline-aware verification** — captures the pre-existing violation count once, then treats only deltas as signal, so old debt doesn't drown new work
+- **Critic** — analyzes failure traces into reusable failure-pattern memory and proposes rule updates — the evolution half that usually never runs
+- **Evolve** — compiles workflows that succeed 3+ times into deterministic scripts
 
 ## Install
 
@@ -62,7 +45,16 @@ cp -r harness-engineering-init ~/.trae/skills/              # Trae
 
 ## Usage
 
-Say **"check harness"**, **"set up harness engineering"**, or just **"harness"**. The skill auto-loads on any task matching its description and walks the agent through the phases above.
+Say **"check harness"**, **"set up harness engineering"**, or just **"harness"**. The skill auto-loads on any matching task and walks the agent through:
+
+```
+health check → init → checkpoint → verify+trace+baseline → Critic → evolve
+  (read-only)  (if absent) (task start)    (on failure)        (self-improve)
+```
+
+## How it works
+
+The loop logic runs on any agent that reads/writes files. **Auto-firing** it depends on platform hooks, and ceilings differ — Claude Code (force-resume) > opencode (file-change detect) > Trae/Codex (soft). No false promises of uniform determinism. See [PLATFORMS.md](PLATFORMS.md).
 
 ## Files
 
@@ -70,11 +62,7 @@ Say **"check harness"**, **"set up harness engineering"**, or just **"harness"**
 |---|---|
 | `SKILL.md` | Main workflow — frontmatter + phased instructions |
 | `TEMPLATES.md` | Checkpoint / trace / failure-pattern / memory / baseline templates |
-| `PLATFORMS.md` | Per-platform triggers & honest capability ceilings |
-
-## Platform honesty
-
-The loop logic runs on any agent that reads/writes files. **Auto-firing** it depends on platform hooks, and ceilings differ — Claude Code (force-resume) > opencode (file-change detect) > Trae/Codex (soft). No false promises of uniform determinism. See `PLATFORMS.md`.
+| `PLATFORMS.md` | Per-platform triggers & capability ceilings |
 
 ## License
 
@@ -86,35 +74,18 @@ MIT
 
 # harness-engineering-init
 
-> 在任意项目上落地并持续运转 harness engineering 范式。
+> 在任意 AI 编码项目上落地并持续运转 harness engineering 范式。
 
-一个标准 agent skill，帮你建立 `.harness/` 循环、用只读健康检查让它活着、并自我改进——让 AI agent 工程不跑偏，而非随性漂移。
-
-## 问题在哪
-
-团队给 AI agent 搭 harness（`.harness/` 含检查点、轨迹、记忆），指望 agent 从失败中学习。现实是：**记录半**（检查点+轨迹）勉强手动跑，而**进化半**（轨迹→Critic 分析→失败模式→规则更新）**一次都没跑**。harness 沦为漂亮的坟墓——有骨架没脉搏。而且没人报告它的健康，失败是**沉默的**。
-
-这个 skill 正是修这个：
-
-- 让死循环**可见**（只读健康检查）
-- 把进化半当作**重点**，不是事后补丁
-- **诚实**标注每个平台能自动强制到什么程度
-
-**核心理念：init 是 5 分钟，让 loop 活着才是活。**
+一个标准 agent skill，搭起 `.harness/` 循环、用只读健康检查让它活着、并自我改进——让 agent 工程不跑偏，而非随性漂移。**init 是 5 分钟，让 loop 活着才是活。**
 
 ## 它做什么
 
-```
-健康检查 → init → 检查点 → 验证+轨迹+基线 → Critic ★ → 进化
- (只读)   (无则建) (任务起)    (失败时)      (会死的那半)
-```
-
-1. **健康检查** — loop 是否活着？（只读，随便跑）
-2. **Init** — 仅 `.harness/` 不存在时脚手架
-3. **检查点** — 任务开始时记录
-4. **验证+轨迹+基线** — 失败时记轨迹；首次记基线，之后只把 **delta** 当信号（既有债务是噪声）
-5. **Critic** — 把轨迹分析成失败模式 → 提议规则更新 ★
-6. **进化** — 重复流程编译成确定性脚本
+- **健康检查**——一次只读扫描告诉你 harness 循环是活着，还是已沉默死亡（常态）
+- **Init**——仅在不存在时脚手架 `.harness/`（检查点、轨迹、记忆）；已有的不重复建
+- **检查点与轨迹**——记录任务起点，以及失败复盘（含根因与修复）
+- **基线感知验证**——首次记下既有违规数，之后只把增量当信号，老债务不淹没新改动
+- **Critic**——把失败轨迹分析成可复用的失败模式记忆，并提议规则更新——通常从不运行的那半
+- **进化**——成功 3 次以上的流程编译成确定性脚本
 
 ## 安装
 
@@ -138,7 +109,16 @@ cp -r harness-engineering-init ~/.trae/skills/              # Trae
 
 ## 用法
 
-说 **"检查 harness"**、**"搭一下 harness engineering"** 或 **"harness"**。skill 在匹配的任务上自动加载，引导 agent 走完上述阶段。
+说 **"检查 harness"**、**"搭一下 harness engineering"** 或 **"harness"**。skill 在匹配的任务上自动加载，引导 agent 走完：
+
+```
+健康检查 → init → 检查点 → 验证+轨迹+基线 → Critic → 进化
+ (只读)   (无则建) (任务起)    (失败时)        (自我改进)
+```
+
+## 工作原理
+
+loop 逻辑在任何能读写文件的 agent 上可用。**自动触发**取决于平台 hook，天花板不等——Claude Code（强制 resume）> opencode（文件变动检测）> Trae/Codex（软触发）。不虚假承诺跨平台同等确定性。见 [PLATFORMS.md](PLATFORMS.md)。
 
 ## 文件
 
@@ -146,11 +126,7 @@ cp -r harness-engineering-init ~/.trae/skills/              # Trae
 |---|---|
 | `SKILL.md` | 主工作流 — frontmatter + 阶段化指令 |
 | `TEMPLATES.md` | 检查点 / 轨迹 / 失败模式 / 记忆 / 基线 模板 |
-| `PLATFORMS.md` | 各平台触发器 + 诚实的能力天花板 |
-
-## 平台诚实
-
-loop 逻辑在任何能读写文件的 agent 上可用。**自动触发**取决于平台 hook，天花板不等——Claude Code（强制 resume）> opencode（文件变动检测）> Trae/Codex（软触发）。不虚假承诺跨平台同等确定性。见 `PLATFORMS.md`。
+| `PLATFORMS.md` | 各平台触发器 + 能力天花板 |
 
 ## 许可
 
