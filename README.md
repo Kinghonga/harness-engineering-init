@@ -1,66 +1,80 @@
 [English](#english) | [中文](#中文)
 
+![tests](https://github.com/Kinghonga/harness-engineering-init/actions/workflows/test.yml/badge.svg)
+![license](https://img.shields.io/badge/license-MIT-blue)
+![standard](https://img.shields.io/badge/agent--skills-standard-7b1fa2)
+
 ---
 
 <a id="english"></a>
 
 # harness-engineering-init
 
-> A standard agent skill that makes AI-agent harness engineering actually run — not just get scaffolded.
+> Your AI agent scaffolded a harness. Did the harness ever actually run?
 
-Most harnesses die the same way: structure gets scaffolded, the "recording half" (checkpoints + failure traces) limps along manually, and the "evolution half" (traces → Critic analysis → failure patterns → rule updates) never runs once. This skill treats the evolution half as the point, makes silent failure visible, and is honest about per-platform trigger limits.
+A standard agent skill that turns a scaffolded-but-dormant harness into a **living, self-improving loop** — and tells you, in one read-only check, whether it's alive.
 
-**Core idea: init is five minutes; keeping the loop alive is the job.**
+## The problem
+
+Teams set up AI-agent harnesses (`.harness/` with checkpoints, traces, memory) expecting the agent to learn from failures. Reality: the **recording half** (checkpoints + traces) limps along manually, while the **evolution half** (traces → Critic analysis → failure patterns → rule updates) **never runs once**. The harness becomes a beautiful graveyard — structure without a pulse. And because nothing reports its health, the failure is **silent**.
+
+This skill fixes exactly that:
+
+- Makes a dead loop **visible** (read-only health check)
+- Treats the evolution half as **the point**, not an afterthought
+- Is **honest** about what each agent platform can auto-enforce
+
+**Core idea: init is five minutes. Keeping the loop alive is the job.**
+
+## What it does
+
+```
+health check → init → checkpoint → verify+trace+baseline → Critic ★ → evolve
+  (read-only)  (if absent) (task start)    (on failure)       (the part that dies)
+```
+
+1. **Health check** — is the loop alive? (read-only, run freely)
+2. **Init** — scaffold `.harness/` only if absent
+3. **Checkpoint** — record when a task starts
+4. **Verify + trace + baseline** — on failure, record the trace; capture a baseline the first time and treat only **deltas** as signal (pre-existing debt is noise)
+5. **Critic** — analyze traces into failure patterns → propose rule updates ★
+6. **Evolve** — compile repeated flows into deterministic scripts
 
 ## Install
 
-The skill follows the open [Agent Skills](https://agentskills.io/specification) standard — a directory with `SKILL.md` (YAML `name` + `description` + markdown body). It works across all major AI coding agents; only the install directory differs:
+Follows the open [Agent Skills](https://agentskills.io/specification) standard. Works on every major AI coding agent — only the directory differs:
 
 | Platform | Global | Project |
 |---|---|---|
 | opencode | `~/.config/opencode/skills/` | `.agents/skills/` |
 | Claude Code | `~/.claude/skills/` | `.claude/skills/` |
 | Codex | `~/.agents/skills/` | `.agents/skills/` |
-| Trae | `~/.trae/skills/` | `.trae/skills/` (or enable `.agents/skills/`) |
+| Trae | `~/.trae/skills/` | `.trae/skills/` |
 
 ```bash
-# opencode
-cp -r harness-engineering-init ~/.config/opencode/skills/
-
-# Claude Code
-cp -r harness-engineering-init ~/.claude/skills/
-
-# Codex
-cp -r harness-engineering-init ~/.agents/skills/
-
-# Trae — or import via Settings → Rules & Skills → Import File
-cp -r harness-engineering-init ~/.trae/skills/
+cp -r harness-engineering-init ~/.config/opencode/skills/   # opencode
+cp -r harness-engineering-init ~/.claude/skills/            # Claude Code
+cp -r harness-engineering-init ~/.agents/skills/            # Codex
+cp -r harness-engineering-init ~/.trae/skills/              # Trae
 ```
 
-`.agents/skills/` is the cross-platform project-level standard dir — Codex and opencode read it natively, and Trae supports it via a settings toggle.
+`.agents/skills/` is the cross-platform project-level standard dir — Codex and opencode read it natively, Trae supports it via a settings toggle.
 
 ## Usage
 
-Once installed, trigger it with phrases like "harness", "check harness", "set up harness engineering". The skill guides the agent through:
-
-1. **Health check** (read-only) — is the loop alive?
-2. **Init** — scaffold `.harness/` only if absent
-3. **Checkpoint** — record when a task starts
-4. **Verify + trace + baseline** — record on failure; capture a baseline the first time and treat only deltas as signal
-5. **Critic** — analyze traces → failure patterns (the half that usually dies) ★
-6. **Evolve** — compile repeated flows into scripts
+Say **"check harness"**, **"set up harness engineering"**, or just **"harness"**. The skill auto-loads on any task matching its description and walks the agent through the phases above.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `SKILL.md` | Main workflow (frontmatter + phased instructions) |
+| `SKILL.md` | Main workflow — frontmatter + phased instructions |
 | `TEMPLATES.md` | Checkpoint / trace / failure-pattern / memory / baseline templates |
-| `PLATFORMS.md` | Per-platform triggers & capability ceilings |
+| `PLATFORMS.md` | Per-platform triggers & honest capability ceilings |
 
-## Platform note
+## Platform honesty
 
-The loop logic works on any agent that can read/write files. **Auto-firing** the loop (instead of relying on the agent remembering) depends on platform hook capability, and ceilings differ (Claude Code > opencode > Trae/Codex). The skill does not promise uniform determinism across platforms — see `PLATFORMS.md`.
+The loop logic runs on any agent that reads/writes files. **Auto-firing** it depends on platform hooks, and ceilings differ — Claude Code (force-resume) > opencode (file-change detect) > Trae/Codex (soft). No false promises of uniform determinism. See `PLATFORMS.md`.
 
 ## License
 
@@ -72,61 +86,71 @@ MIT
 
 # harness-engineering-init
 
-> 一个让 AI Agent 的 harness engineering 真正"跑起来"的标准 skill。
+> 你的 AI agent 搭好了 harness。但它真的跑起来过吗？
 
-大多数 harness 死于同一原因：结构搭好了，"记录半"（检查点 + 失败轨迹）勉强手动跑，而"进化半"（轨迹 → Critic 分析 → 失败模式 → 规则更新）一次都没跑。这个 skill 把进化半当作重点，让沉默失败可见，并诚实标注各平台触发能力的上限。
+一个标准 agent skill，把"搭了却没跑"的 harness 变成**活着的、自我改进的循环**——并用一次只读检查告诉你它是否还活着。
+
+## 问题在哪
+
+团队给 AI agent 搭 harness（`.harness/` 含检查点、轨迹、记忆），指望 agent 从失败中学习。现实是：**记录半**（检查点+轨迹）勉强手动跑，而**进化半**（轨迹→Critic 分析→失败模式→规则更新）**一次都没跑**。harness 沦为漂亮的坟墓——有骨架没脉搏。而且没人报告它的健康，失败是**沉默的**。
+
+这个 skill 正是修这个：
+
+- 让死循环**可见**（只读健康检查）
+- 把进化半当作**重点**，不是事后补丁
+- **诚实**标注每个平台能自动强制到什么程度
 
 **核心理念：init 是 5 分钟，让 loop 活着才是活。**
 
+## 它做什么
+
+```
+健康检查 → init → 检查点 → 验证+轨迹+基线 → Critic ★ → 进化
+ (只读)   (无则建) (任务起)    (失败时)      (会死的那半)
+```
+
+1. **健康检查** — loop 是否活着？（只读，随便跑）
+2. **Init** — 仅 `.harness/` 不存在时脚手架
+3. **检查点** — 任务开始时记录
+4. **验证+轨迹+基线** — 失败时记轨迹；首次记基线，之后只把 **delta** 当信号（既有债务是噪声）
+5. **Critic** — 把轨迹分析成失败模式 → 提议规则更新 ★
+6. **进化** — 重复流程编译成确定性脚本
+
 ## 安装
 
-skill 采用开放的 [Agent Skills](https://agentskills.io/specification) 标准——一个目录 + `SKILL.md`（YAML `name` + `description` + markdown 正文）。各大 AI 编码 agent 通用，差的只是安装目录：
+采用开放 [Agent Skills](https://agentskills.io/specification) 标准。各大 agent 通用，只差目录：
 
 | 平台 | 全局 | 项目级 |
 |---|---|---|
 | opencode | `~/.config/opencode/skills/` | `.agents/skills/` |
 | Claude Code | `~/.claude/skills/` | `.claude/skills/` |
 | Codex | `~/.agents/skills/` | `.agents/skills/` |
-| Trae | `~/.trae/skills/` | `.trae/skills/`（或启用 `.agents/skills/`） |
+| Trae | `~/.trae/skills/` | `.trae/skills/` |
 
 ```bash
-# opencode
-cp -r harness-engineering-init ~/.config/opencode/skills/
-
-# Claude Code
-cp -r harness-engineering-init ~/.claude/skills/
-
-# Codex
-cp -r harness-engineering-init ~/.agents/skills/
-
-# Trae —— 也可通过 设置 → Rules & Skills → Import File 导入
-cp -r harness-engineering-init ~/.trae/skills/
+cp -r harness-engineering-init ~/.config/opencode/skills/   # opencode
+cp -r harness-engineering-init ~/.claude/skills/            # Claude Code
+cp -r harness-engineering-init ~/.agents/skills/            # Codex
+cp -r harness-engineering-init ~/.trae/skills/              # Trae
 ```
 
 `.agents/skills/` 是跨平台项目级标准目录——Codex 和 opencode 原生读取，Trae 可通过设置开关启用。
 
 ## 用法
 
-安装后，用 "harness"、"检查 harness"、"搭一下 harness engineering" 等触发。skill 会按阶段引导：
-
-1. **健康检查**（只读）— loop 是否还活着
-2. **Init** — 仅在 `.harness/` 不存在时脚手架
-3. **检查点** — 任务开始时记录
-4. **验证 + 轨迹 + 基线** — 失败时记录；首次记基线，之后只把 delta 当信号
-5. **Critic** — 分析轨迹 → 失败模式（通常死掉的那半）★
-6. **进化** — 重复流程编译成脚本
+说 **"检查 harness"**、**"搭一下 harness engineering"** 或 **"harness"**。skill 在匹配的任务上自动加载，引导 agent 走完上述阶段。
 
 ## 文件
 
 | 文件 | 作用 |
 |---|---|
-| `SKILL.md` | 主工作流（frontmatter + 阶段化指令） |
+| `SKILL.md` | 主工作流 — frontmatter + 阶段化指令 |
 | `TEMPLATES.md` | 检查点 / 轨迹 / 失败模式 / 记忆 / 基线 模板 |
-| `PLATFORMS.md` | 各平台触发器 + 能力天花板 |
+| `PLATFORMS.md` | 各平台触发器 + 诚实的能力天花板 |
 
-## 平台说明
+## 平台诚实
 
-loop 逻辑在任何能读写文件的 agent 上可用。**自动触发**循环（而非靠 agent 记得）取决于平台 hook 能力，天花板不等（Claude Code > opencode > Trae/Codex）。skill 不承诺跨平台同等确定性——详见 `PLATFORMS.md`。
+loop 逻辑在任何能读写文件的 agent 上可用。**自动触发**取决于平台 hook，天花板不等——Claude Code（强制 resume）> opencode（文件变动检测）> Trae/Codex（软触发）。不虚假承诺跨平台同等确定性。见 `PLATFORMS.md`。
 
 ## 许可
 
