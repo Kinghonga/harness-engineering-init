@@ -10,9 +10,9 @@
 
 # harness-engineering-init
 
-> Your AI agent scaffolded a harness. Did the harness ever actually run?
+> Adopt and sustain the harness-engineering paradigm on any project.
 
-A standard agent skill that turns a scaffolded-but-dormant harness into a **living, self-improving loop** — and tells you, in one read-only check, whether it's alive.
+A standard agent skill that helps you establish the `.harness/` loop, keep it alive with a read-only health check, and make it self-improving — so AI agent engineering stays on track instead of drifting.
 
 ## The problem
 
@@ -86,9 +86,9 @@ MIT
 
 # harness-engineering-init
 
-> 你的 AI agent 搭好了 harness。但它真的跑起来过吗？
+> 在任意项目上落地并持续运转 harness engineering 范式。
 
-一个标准 agent skill，把"搭了却没跑"的 harness 变成**活着的、自我改进的循环**——并用一次只读检查告诉你它是否还活着。
+一个标准 agent skill，帮你建立 `.harness/` 循环、用只读健康检查让它活着、并自我改进——让 AI agent 工程不跑偏，而非随性漂移。
 
 ## 问题在哪
 
