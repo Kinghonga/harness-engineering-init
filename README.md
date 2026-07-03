@@ -10,18 +10,24 @@
 
 # harness-engineering-init
 
-> Adopt and sustain the harness-engineering paradigm on any AI coding project.
+> Build a harness that actually runs — not a beautiful graveyard.
 
-A standard agent skill that scaffolds the `.harness/` loop, keeps it alive with a read-only health check, and makes it self-improving — so agent engineering stays on track instead of drifting. **Init is five minutes; keeping the loop alive is the job.**
+Most harness-engineering skills stop at scaffolding `.harness/` and `AGENTS.md`. This one goes further: a read-only **health check** detects when your loop has silently died (the usual state), and the **Critic** phase closes the trace → failure-pattern loop that teams almost always skip. Born from a real project whose fully-scaffolded harness ran once in 60 days — silently.
 
 ## What is harness engineering?
 
-It's the practice of encoding a project's architecture constraints, conventions, and verification gates into the repo itself — an `AGENTS.md` entry point, a `.harness/` memory store, and pre-verification checks — so an AI coding agent works reliably from what it can **see and verify**, not what it **remembers**. The aim is a self-improving loop: every failure is recorded, analyzed into a pattern, and fed back as a rule, so the next agent inherits the lessons.
+It's the practice of encoding a project's architecture constraints, conventions, and verification gates into the repo itself — an `AGENTS.md` entry point, a `.harness/` memory store, and pre-verification checks — so an AI coding agent works reliably from what it can **see and verify**, not what it **remembers**. The aim is a self-improving loop: every failure is recorded, analyzed into a pattern, and fed back as a rule.
+
+## What's different
+
+Most harness skills teach you to **build** a harness. Few tell you whether it's **still running** three weeks later. This skill was built after a real project's harness — fully scaffolded, with checkpoints, traces, and memory dirs — ran exactly once in 60 days, silently, because nothing reported the loop's health.
+
+So it leads with the opposite question: **is the loop alive?** A read-only check answers in one pass. Then it closes the part that usually dies — the Critic analysis that turns failure traces into reusable patterns and rule updates. It's also honest about per-platform trigger ceilings (Claude Code > opencode > Trae/Codex) instead of promising uniform "automatic harness."
 
 ## What it does
 
-- **Health check** — one read-only pass tells you whether the harness loop is alive, or silently dead (the usual state)
-- **Init** — scaffolds `.harness/` (checkpoints, traces, memory) only when absent; never re-scaffolds an existing one
+- **Health check** — one read-only pass tells you whether the loop is alive, or silently dead (`BROKEN` / `DORMANT` / `STALE` / `HEALTHY`)
+- **Init** — scaffolds `.harness/` only when absent; never re-scaffolds an existing one
 - **Checkpoints & traces** — records task starts and failure post-mortems with root cause and fix
 - **Baseline-aware verification** — captures the pre-existing violation count once, then treats only deltas as signal, so old debt doesn't drown new work
 - **Critic** — analyzes failure traces into reusable failure-pattern memory and proposes rule updates; this is the learning step teams most often skip
@@ -69,7 +75,7 @@ cp -r harness-engineering-init ~/.trae/skills/              # Trae
 
 ## Usage
 
-Say **"check harness"**, **"set up harness engineering"**, or just **"harness"**. The skill auto-loads on any matching task and walks the agent through:
+Say **"check harness"**, **"is my harness alive"**, or just **"harness"**. The skill auto-loads on any matching task and walks the agent through:
 
 ```
 health check → init → checkpoint → verify+trace+baseline → Critic → evolve
@@ -98,21 +104,27 @@ MIT
 
 # harness-engineering-init
 
-> 在任意 AI 编码项目上落地并持续运转 harness engineering 范式。
+> 搭一个真正在跑的 harness——别让它沦为漂亮的坟墓。
 
-一个标准 agent skill，搭起 `.harness/` 循环、用只读健康检查让它活着、并自我改进——让 agent 工程不跑偏，而非随性漂移。**init 是 5 分钟，让 loop 活着才是活。**
+多数 harness engineering skill 停在脚手架（`.harness/` + `AGENTS.md`）。这个更进一步：只读**健康检查**检测循环是否已沉默死亡（常态），**Critic** 阶段闭合那条团队几乎总跳过的 trace → 失败模式 回路。源自一个真实项目——搭好的 harness 60 天只活了 6 天，悄无声息。
 
 ## 什么是 harness engineering？
 
-把项目的架构约束、规范和验证闸门编码进仓库的实践——一个 `AGENTS.md` 入口、一个 `.harness/` 记忆存储、一套预验证检查——让 AI 编码 agent 靠**看见与验证**可靠工作，而非靠**记忆**。目标是自我改进的循环：每次失败被记录、分析成模式、回写为规则，下一个 agent 继承这些教训。
+把项目的架构约束、规范和验证闸门编码进仓库的实践——一个 `AGENTS.md` 入口、一个 `.harness/` 记忆存储、一套预验证检查——让 AI 编码 agent 靠**看见与验证**可靠工作，而非靠**记忆**。目标是自我改进的循环：每次失败被记录、分析成模式、回写为规则。
+
+## 有什么不同
+
+多数 harness skill 教你**搭** harness。很少有谁告诉你三周后它**还在跑吗**。这个 skill 源自一个真实项目——harness 全套搭好（检查点、轨迹、记忆目录齐备），60 天里只跑了 6 天，悄无声息，因为没人报告循环的健康。
+
+所以它先问相反的问题：**循环还活着吗？** 一次只读检查就能回答。然后闭合通常死掉的那半——把失败轨迹分析成可复用模式并回写规则的 Critic。它还诚实标注各平台触发天花板（Claude Code > opencode > Trae/Codex），不吹"全自动 harness"。
 
 ## 它做什么
 
-- **健康检查**——一次只读扫描告诉你 harness 循环是活着，还是已沉默死亡（常态）
-- **Init**——仅在不存在时脚手架 `.harness/`（检查点、轨迹、记忆）；已有的不重复建
+- **健康检查**——一次只读扫描告诉你循环是活着，还是已沉默死亡（`BROKEN` / `DORMANT` / `STALE` / `HEALTHY`）
+- **Init**——仅在不存在时脚手架 `.harness/`；已有的不重复建
 - **检查点与轨迹**——记录任务起点，以及失败复盘（含根因与修复）
 - **基线感知验证**——首次记下既有违规数，之后只把增量当信号，老债务不淹没新改动
-- **Critic**——把失败轨迹分析成可复用的失败模式记忆，并提议规则更新；这是团队最常跳过的“学习”步骤
+- **Critic**——把失败轨迹分析成可复用的失败模式记忆，并提议规则更新；这是团队最常跳过的"学习"步骤
 - **进化**——成功 3 次以上的流程编译成确定性脚本
 
 ## 项目布局
@@ -129,7 +141,7 @@ your-project/
     ├── trace/             # 失败复盘 — 错误、根因、修复
     │   └── failure-{type}-{date}.md
     └── memory/
-        ├── episodic/      # 一次性教训（“这个坑过一次”）
+        ├── episodic/      # 一次性教训（"这个坑过一次"）
         ├── failures/      # Critic 产出 — 反复出现的失败模式 + 规则提议
         │   └── {pattern}.md
         └── procedural/    # 编译成脚本的可复用流程
@@ -157,7 +169,7 @@ cp -r harness-engineering-init ~/.trae/skills/              # Trae
 
 ## 用法
 
-说 **"检查 harness"**、**"搭一下 harness engineering"** 或 **"harness"**。skill 在匹配的任务上自动加载，引导 agent 走完：
+说 **"检查 harness"**、**"我的 harness 还活着吗"** 或 **"harness"**。skill 在匹配的任务上自动加载，引导 agent 走完：
 
 ```
 健康检查 → init → 检查点 → 验证+轨迹+基线 → Critic → 进化
